@@ -1,3 +1,6 @@
+using Clinic_App_01.Models;
+using Microsoft.EntityFrameworkCore;
+
 namespace Clinic_App_01
 {
     public class Program
@@ -8,6 +11,15 @@ namespace Clinic_App_01
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            //builder.Services.AddDbContext<ClinicContext>(
+            //    options => options.UseSqlServer("Data Source=.;Initial Catalog=ClinicDB;Integrated Security=true;Encrypt=false"));
+
+            builder.Services.AddDbContext<ClinicContext>(
+                options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            //builder.Services.AddDbContext<ClinicContext>(
+            //    options => options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]));
 
             var app = builder.Build();
 
