@@ -4,7 +4,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Appointments</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -24,13 +24,14 @@
             <th>
                 @Html.DisplayNameFor(model => model.Doctor)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AppointmentDateTime)
-            </th>
+            <th>Date</th>
+            <th>Time</th>
             <th>
                 @Html.DisplayNameFor(model => model.Status)
             </th>
             <th></th>
+
+
         </tr>
     </thead>
     <tbody>
@@ -48,9 +49,8 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Doctor.Name)
                 </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AppointmentDateTime)
-            </td>
+                <td>@item.AppointmentDateTime.ToString("yyyy-MM-dd")</td> <!-- Display Date Only -->
+                <td>@item.AppointmentDateTime.ToString("HH:mm tt")</td>  <!-- Display Time Only -->
             <td>
                 @Html.DisplayFor(modelItem => item.Status)
             </td>
