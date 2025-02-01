@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Clinic_App_01.Models;
 using Clinic_App_01.Repository;
+using Microsoft.Data.SqlClient;
 
 namespace Clinic_App_01.Controllers
 {
@@ -27,9 +28,34 @@ namespace Clinic_App_01.Controllers
         }
 
         // GET: Patients
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder)
         {
-            var patients = await _patientRepository.GetAllAsync();
+            IEnumerable<Patient> patients;
+
+            if (sortOrder == "name")
+            {
+                patients = await _patientRepository.GetPatientsSortedByNameAsync();
+            }
+
+            else if (sortOrder == "age")
+            {
+                patients = await _patientRepository.GetPatientsSortedByAgeAsync();
+            }
+
+            else if (sortOrder == "male")
+            {
+                patients = await _patientRepository.GetPatientsSortedByMaleGenderAsync();
+            }
+
+            else if (sortOrder == "female")
+            {
+                patients = await _patientRepository.GetPatientsSortedByFemaleGenderAsync();
+            }
+            else
+            {
+                patients = await _patientRepository.GetAllAsync(); // Default order
+            }
+
             return View(patients);
         }
 

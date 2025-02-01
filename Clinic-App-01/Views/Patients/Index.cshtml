@@ -8,7 +8,17 @@
 
 <p>
     <a asp-action="Create">Create New</a>
+   
 </p>
+
+<a asp-action="Index" asp-route-sortOrder="" class="btn btn-primary">Show All</a>
+<a asp-action="Index" asp-route-sortOrder="name" class="btn btn-primary ">Sort by Name</a>
+<a asp-action="Index" asp-route-sortOrder="age" class="btn btn-primary ">Sort by Age</a>
+<a asp-action="Index" asp-route-sortOrder="male" class="btn btn-primary">Show Males</a>
+<a asp-action="Index" asp-route-sortOrder="female" class="btn btn-primary">Show Females</a>
+
+
+
 <table class="table">
     <thead>
         <tr>
