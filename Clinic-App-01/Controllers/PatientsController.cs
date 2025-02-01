@@ -6,22 +6,31 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Clinic_App_01.Models;
+using Clinic_App_01.Repository;
 
 namespace Clinic_App_01.Controllers
 {
     public class PatientsController : Controller
     {
-        private readonly ClinicContext _context;
+        //private readonly ClinicContext _context;
 
-        public PatientsController(ClinicContext context)
+        //public PatientsController(ClinicContext context)
+        //{
+        //    _context = context;
+        //}
+
+        private readonly IPatientRepository _patientRepository;
+
+        public PatientsController(IPatientRepository patientRepository)
         {
-            _context = context;
+            _patientRepository = patientRepository;
         }
 
         // GET: Patients
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Patients.ToListAsync());
+            var patients = await _patientRepository.GetAllAsync();
+            return View(patients);
         }
 
         // GET: Patients/Details/5
@@ -32,8 +41,7 @@ namespace Clinic_App_01.Controllers
                 return NotFound();
             }
 
-            var patient = await _context.Patients
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var patient = await _patientRepository.GetByIdAsync(id);
             if (patient == null)
             {
                 return NotFound();
@@ -57,8 +65,8 @@ namespace Clinic_App_01.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(patient);
-                await _context.SaveChangesAsync();
+                await _patientRepository.AddAsync(patient);
+                await _patientRepository.SaveAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(patient);
@@ -72,7 +80,7 @@ namespace Clinic_App_01.Controllers
                 return NotFound();
             }
 
-            var patient = await _context.Patients.FindAsync(id);
+            var patient = await _patientRepository.GetByIdAsync(id);
             if (patient == null)
             {
                 return NotFound();
@@ -96,12 +104,12 @@ namespace Clinic_App_01.Controllers
             {
                 try
                 {
-                    _context.Update(patient);
-                    await _context.SaveChangesAsync();
+                    await _patientRepository.UpdateAsync(patient);
+                    await _patientRepository.SaveAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PatientExists(patient.Id))
+                    if (!_patientRepository.PatientExists(patient.Id))
                     {
                         return NotFound();
                     }
@@ -123,8 +131,7 @@ namespace Clinic_App_01.Controllers
                 return NotFound();
             }
 
-            var patient = await _context.Patients
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var patient = await _patientRepository.GetByIdAsync(id);
             if (patient == null)
             {
                 return NotFound();
@@ -138,19 +145,20 @@ namespace Clinic_App_01.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var patient = await _context.Patients.FindAsync(id);
+            var patient = await _patientRepository.GetByIdAsync(id);
+
             if (patient != null)
             {
-                _context.Patients.Remove(patient);
+                await _patientRepository.DeleteAsync(id);
             }
 
-            await _context.SaveChangesAsync();
+            await _patientRepository.SaveAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool PatientExists(int id)
+        private bool PatientExists(int? id)
         {
-            return _context.Patients.Any(e => e.Id == id);
+            return _patientRepository.PatientExists(id);
         }
     }
 }

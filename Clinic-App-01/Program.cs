@@ -1,4 +1,5 @@
 using Clinic_App_01.Models;
+using Clinic_App_01.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace Clinic_App_01
@@ -20,6 +21,8 @@ namespace Clinic_App_01
 
             //builder.Services.AddDbContext<ClinicContext>(
             //    options => options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]));
+
+            builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 
             var app = builder.Build();
 
