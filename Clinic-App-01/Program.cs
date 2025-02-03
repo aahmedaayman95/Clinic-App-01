@@ -10,9 +10,11 @@ namespace Clinic_App_01
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            // Add JSON serializer & deserializer services to the container.
+            builder.Services.AddControllersWithViews().AddNewtonsoftJson();
+    
 
+            builder.Services.AddHttpClient();
             //builder.Services.AddDbContext<ClinicContext>(
             //    options => options.UseSqlServer("Data Source=.;Initial Catalog=ClinicDB;Integrated Security=true;Encrypt=false"));
 
@@ -35,11 +37,13 @@ namespace Clinic_App_01
             }
 
             app.UseHttpsRedirection();
+
             app.UseRouting();
 
             app.UseAuthorization();
 
             app.MapStaticAssets();
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")

@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Clinic_App_01.Models;
 using Clinic_App_01.Repository;
 using Microsoft.Data.SqlClient;
+using System.Net.Http;
+using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace Clinic_App_01.Controllers
 {
@@ -21,16 +24,19 @@ namespace Clinic_App_01.Controllers
         //}
 
         private readonly IPatientRepository _patientRepository;
+        private readonly HttpClient _httpClient;
 
-        public PatientsController(IPatientRepository patientRepository)
+
+        public PatientsController(IPatientRepository patientRepository , IHttpClientFactory httpClientFactory)
         {
             _patientRepository = patientRepository;
+            _httpClient = httpClientFactory.CreateClient();
         }
 
         // GET: Patients
         public async Task<IActionResult> Index(string sortOrder)
         {
-            IEnumerable<Patient> patients;
+            IEnumerable<Patient> patients = new List<Patient>();
 
             if (sortOrder == "name")
             {
@@ -53,10 +59,32 @@ namespace Clinic_App_01.Controllers
             }
             else
             {
-                patients = await _patientRepository.GetAllAsync(); // Default order
+                //default order
+                HttpResponseMessage response = await _httpClient.GetAsync("https://localhost:7107/api/patients");
+
+                if (response.IsSuccessStatusCode)
+                {
+
+
+                    //to view data
+                    string responseContent = await response.Content.ReadAsStringAsync();
+
+                    if(responseContent != null)
+                    patients = JsonConvert.DeserializeObject<IEnumerable<Patient>>(responseContent);
+                    
+
+                }
+                else
+                {
+                    // Handle error
+
+                    return BadRequest();
+                }
             }
 
             return View(patients);
+            
+
         }
 
         // GET: Patients/Details/5
