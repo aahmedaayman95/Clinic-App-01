@@ -11,8 +11,18 @@ namespace Clinic_App_01
             var builder = WebApplication.CreateBuilder(args);
 
             // Add JSON serializer & deserializer services to the container.
+            //Enable Custom Client Side Validation
             builder.Services.AddControllersWithViews().AddNewtonsoftJson();
-    
+
+
+            //we use this if client side validation isn't enabled or disabled somewhere else - default client side validation is working using jquery lib
+            //builder.Services.AddControllersWithViews().AddNewtonsoftJson().AddViewOptions(
+            //    options =>
+            //    {
+            //        options.HtmlHelperOptions.ClientValidationEnabled = true;
+            //    }
+            //    );
+
 
             builder.Services.AddHttpClient();
             //builder.Services.AddDbContext<ClinicContext>(
