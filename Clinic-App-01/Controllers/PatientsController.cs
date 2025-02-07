@@ -25,13 +25,17 @@ namespace Clinic_App_01.Controllers
         //    _context = context;
         //}
 
-        private readonly IPatientRepository _patientRepository;
+
+        //will be used in case of using repo pattern
+        //private readonly IPatientRepository _patientRepository;
+
+        //Creating httpClient instance to use APIS
         private readonly HttpClient _httpClient;
 
 
-        public PatientsController(IPatientRepository patientRepository , IHttpClientFactory httpClientFactory)
+        public PatientsController( IHttpClientFactory httpClientFactory)
         {
-            _patientRepository = patientRepository;
+            //_patientRepository = patientRepository;
             _httpClient = httpClientFactory.CreateClient();
         }
 
@@ -42,7 +46,7 @@ namespace Clinic_App_01.Controllers
 
             if (sortOrder == "name")
             {
-                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:7107/Api/Patients/SortByName?name={sortOrder}");
+                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:7107/Api/Patients/SortByName");
 
 
                 //this code need to be refactored as it repeated many places.
@@ -68,7 +72,7 @@ namespace Clinic_App_01.Controllers
 
             else if (sortOrder == "age")
             {
-                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:7107/Api/Patients/SortByAge?name={sortOrder}");
+                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:7107/Api/Patients/SortByAge");
 
 
                 //this code need to be refactored as it repeated many places.
@@ -94,7 +98,7 @@ namespace Clinic_App_01.Controllers
 
             else if (sortOrder == "male")
             {
-                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:7107/Api/Patients/ShowMales?name={sortOrder}");
+                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:7107/Api/Patients/ShowMales");
 
 
                 //this code need to be refactored as it repeated many places.
@@ -120,7 +124,7 @@ namespace Clinic_App_01.Controllers
 
             else if (sortOrder == "female")
             {
-                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:7107/Api/Patients/ShowFemales?name={sortOrder}");
+                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:7107/Api/Patients/ShowFemales");
 
 
                 //this code need to be refactored as it repeated many places.
@@ -276,16 +280,38 @@ namespace Clinic_App_01.Controllers
         // GET: Patients/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+
+            //refactor this code (same in details controller)
             if (id == null)
             {
                 return NotFound();
             }
 
-            var patient = await _patientRepository.GetByIdAsync(id);
-            if (patient == null)
+            Patient patient = new Patient();
+
+
+            HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:7107/Api/Patients/{id}");
+
+            //this code need to be refactored as it repeated many places.
+            if (response.IsSuccessStatusCode)
             {
-                return NotFound();
+
+
+                //to view data
+                string responseContent = await response.Content.ReadAsStringAsync();
+
+                if (responseContent != null)
+                    patient = JsonConvert.DeserializeObject<Patient>(responseContent);
+
+
             }
+            else
+            {
+                // Handle error
+
+                return BadRequest();
+            }
+
             return View(patient);
         }
 
@@ -430,9 +456,9 @@ namespace Clinic_App_01.Controllers
         }
 
         // POST: Patients/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int id)
         {
 
             try
@@ -472,9 +498,9 @@ namespace Clinic_App_01.Controllers
             //return RedirectToAction(nameof(Index));
         }
 
-        private bool PatientExists(int? id)
-        {
-            return _patientRepository.PatientExists(id);
-        }
+        //private bool PatientExists(int? id)
+        //{
+        //    return _patientRepository.PatientExists(id);
+        //}
     }
 }
